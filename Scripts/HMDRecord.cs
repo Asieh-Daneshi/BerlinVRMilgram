@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+using System.IO;
+
 public class HMDRecord : MonoBehaviour
 {
     readonly List<string> data = new();
@@ -104,12 +106,12 @@ public class HMDRecord : MonoBehaviour
     public void StopAndWriteData()
     {
         recording = false;
-        //LogManager.instance.WriteEntry(data);
+        LogManager.instance.WriteEntry(data);
     }
 
 
     public void WriteHeader()
     {
-        //LogManager.instance.WriteEntry(string.Join(";", header));
+        LogManager.instance.WriteEntry(string.Join(";", header));
     }
 }
