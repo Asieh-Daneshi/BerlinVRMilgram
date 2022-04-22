@@ -33,29 +33,29 @@ namespace Experiment.Scripts.Core
 
         void Start()
         {
-//         GameObject go = GameObject.Find("Canvas");
-//         if (go != null) {
-//             canvasUI = go.GetComponent<Canvas>();
-//         } else {
-// #if UNITY_EDITOR
-//             EditorUtility.DisplayDialog("Error", "Canvas not found", "OK");
-// #endif
-//             Application.Quit();
-//         }
-//
-//         go = GameObject.Find("TextUI");
-//         if (go != null) {
-//             textUI = go.GetComponent<Text>();
-//         } else {
-// #if UNITY_EDITOR
-//             EditorUtility.DisplayDialog("Error", "TextUI not found", "OK");
-// #endif            
-//             Application.Quit();
-//         }
+            //         GameObject go = GameObject.Find("Canvas");
+            //         if (go != null) {
+            //             canvasUI = go.GetComponent<Canvas>();
+            //         } else {
+            // #if UNITY_EDITOR
+            //             EditorUtility.DisplayDialog("Error", "Canvas not found", "OK");
+            // #endif
+            //             Application.Quit();
+            //         }
+            //
+            //         go = GameObject.Find("TextUI");
+            //         if (go != null) {
+            //             textUI = go.GetComponent<Text>();
+            //         } else {
+            // #if UNITY_EDITOR
+            //             EditorUtility.DisplayDialog("Error", "TextUI not found", "OK");
+            // #endif            
+            //             Application.Quit();
+            //         }
 
-
+            #region pause between blocks
             TextAsset txtAssetPause;
-            var strFNPause = Path.Combine(Application.streamingAssetsPath, "Pause.txt");
+            var strFNPause = Path.Combine(Application.streamingAssetsPath, "Pause.txt");    // AD: Use the StreamingAssets folder to store Assets. At run time, Application.streamingAssetsPath provides the path to the folder. Add the Asset name to Application.streamingAssetsPath.
             if (!File.Exists(strFNPause))
             {
                 var strErrorMessage = "Error:\n\"" + strFNPause + "\"\ndoes not exist";
@@ -65,8 +65,9 @@ namespace Experiment.Scripts.Core
             {
                 txtAssetPause = new TextAsset(File.ReadAllText(strFNPause));
             }
+            #endregion
 
-
+            #region thank message at the ned of the experiment and ending the experiment
             TextAsset txtAssetThanks;
             var strFNThanks = Path.Combine(Application.streamingAssetsPath, "Thanks.txt");
             if (!File.Exists(strFNThanks))
@@ -81,9 +82,9 @@ namespace Experiment.Scripts.Core
 
             expRunning = false;
             expPaused = false;
-
+            #endregion
             // string Nr = EnterNR.NumberText;
-            var jsonfile = "00001.json"; //string.Format("{0}.json", Nr);
+            var jsonfile = "00001.json"; //string.Format("{0}.json", Nr);   //AD: introducing the file containing the experimental parameters
 
             //--  TextAsset txtAssetJSON = (TextAsset)Resources.Load("exp_v04");
             var strFNJSON = Path.Combine(Application.streamingAssetsPath, jsonfile);
