@@ -175,7 +175,7 @@ namespace Experiment.Scripts.Core
                     qq++;
                     print("trial " + qq);
                     var fMeanSOA = t.soa_means_ms;  // AD: gets the starting time of the audio for the current trial
-                    var normalDist = new Normal(fMeanSOA, fSdSOA);  // AD: "fSdSOA" comes from the "soa_sd_ms" in json files. It is always zero. Therefore, this Normal distribution does nothing!
+                    var normalDist = new Normal(fMeanSOA, fSdSOA);  // AD: "fSdSOA" comes from the "soa_sd_ms" in json files. It is always zero. Therefore, this Normal distribution does nothing! But, if we want to set different gaze times for each agent (line 378), we should change the standard deviation.
 
                     hmdRecord.StartRecording();     // AD: calls "hmdRecord" that we introduced in line 31 as "HMDRecord" which is a separate piece of code! So, here the data recording is started.
 
@@ -187,6 +187,10 @@ namespace Experiment.Scripts.Core
                     var targetPos = target.transform.position;  // AD: find the position of the current target.
                     currentTarget = strTarget;
                     var strTargetPpn = "";  // AD: defines a new variable "strTargetPpn", which its initial value is empty!
+
+                    #region permuting audios in "currentTargetPpn"
+                    /* AD: in this region all the possible permutations from 3 different audio cues are generated. "currentTargetPpn" can be 1, 2, or "choose", meaning that the participant must look at target 1, 2, or has the option to choose between them!
+                    also, we have 3 different audios: 1) gunshot, 2) collapse, and 3) glass breaking. 3 different audios and three option for placing each of them ("currentTargetPpn") makes 6 permutations!*/
 
                     if (condition == 1)     // AD: condition is extracted from json files in line 150. We have 6 different conditions. Each json file has 1 condition. They are not shuffled. So, files 1 to 6 are corresponding to conditions 1 to 6, and then these will repeat again, meaning that 8th file for example has condition 2.
                     {
@@ -306,71 +310,73 @@ namespace Experiment.Scripts.Core
                             currentTargetPpn = strTargetPpn;
                         }
                     }
-
+                    #endregion
 
                     var targetPpn = GameObject.Find(strTargetPpn);
                     var targetPosPpn = targetPpn.transform.position;
 
                     LightTargetFires(true);
 
-                    var audioCue = t.audio_cue;
-                    var gazeLoc = t.gaze_loc;
-                    var charactersGazing = t.characters_gazing;
-
+                    var audioCue = t.audio_cue;     // AD: comes from json files. It can be 1, 2, or 3.
+                    var gazeLoc = t.gaze_loc;     // AD: comes from json files. It can be either 1 or 2, depending on the target that the agents are supposed to look at in each trial.
+                    var charactersGazing = t.characters_gazing;     // AD: comes from json files, the agents that look at one of the targets in each trial.
+                    #region record experiment configuration
+                    // in this region we generally record audio_cue and gaze_loc. We also record the target name and position if the "currentTargetPpn" is not "choose".
                     if (condition == 1)
                         if (t.audio_cue != 3)
                         {
-                            //LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
-                            //LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
+                            LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
+                            LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
                         }
 
                     if (condition == 2)
                         if (t.audio_cue != 2)
                         {
-                            //LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
-                            //LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
+                            LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
+                            LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
                         }
 
                     if (condition == 3)
                         if (t.audio_cue != 3)
                         {
-                            //LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
-                            //LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
+                            LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
+                            LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
                         }
 
                     if (condition == 4)
                         if (t.audio_cue != 2)
                         {
-                            //LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
-                            //LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
+                            LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
+                            LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
                         }
 
                     if (condition == 5)
                         if (t.audio_cue != 1)
                         {
-                            //LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
-                            //LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
+                            LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
+                            LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
                         }
 
                     if (condition == 6)
                         if (t.audio_cue != 1)
                         {
-                            //LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
-                            //LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
+                            LogManager.instance.WriteTimeStampedEntry("target:" + strTargetPpn);
+                            LogManager.instance.WriteTimeStampedEntry("target position:" + targetPosPpn.ToString());
                         }
 
-
-                    //LogManager.instance.WriteTimeStampedEntry("audio cue:" + audio_cue);
-                    //LogManager.instance.WriteTimeStampedEntry("gaze_loc:" + gaze_loc);
+                    // AD: in the next two lines, we generally save "audio_cue" and "gaze_loc"
+                    LogManager.instance.WriteTimeStampedEntry("audio cue:" + t.audio_cue);
+                    LogManager.instance.WriteTimeStampedEntry("gaze_loc:" + t.gaze_loc);
+                    #endregion
                     //--double fSOAms = normalDist.Sample();
                     //--//LogManager.instance.WriteTimeStampedEntry("SOA_ms:" + fSOAms.ToString());
 
-                    //LogManager.instance.WriteTimeStampedEntry("characters:" + characters_gazing.Length);
-                    //LogManager.instance.WriteTimeStampedEntry("TargetHit:");
+                    LogManager.instance.WriteTimeStampedEntry("characters:" + t.characters_gazing.Length);  // AD: number of agents looking at the target
+                    LogManager.instance.WriteTimeStampedEntry("TargetHit:"+ t.gaze_loc);
                     PlayAudioCue.audioPlayer.playAudioCue(audioCue);
 
-                    /* create array with delays for each character */
-            var arrDelays = new double[charactersGazing.Length];
+                    // AD: create array with delays for each character. Currently, in line 178, the standard deviation is zero. So, the normal distribution is just a dirac delta function at the mean value of the Normal dictribution.
+                    var arrDelays = new double[charactersGazing.Length];
                     normalDist.Samples(arrDelays);
                     Array.Sort(arrDelays);
 
@@ -380,7 +386,8 @@ namespace Experiment.Scripts.Core
                     // -- yield return new WaitForSecondsRealtime((float)(fSOAms / 1000));
 
 
-                    // ADD THE DELAYS HERE
+                    #region add delays
+                    // AD: here, we find the delay for each agent from the beginnig of the trial. ATM waiting time is the same for all the agents. Therefore, this region currently does nothing
 
                     double fDelayOld = 0;
                     var ii = 0;
@@ -405,7 +412,7 @@ namespace Experiment.Scripts.Core
                         ii++;
 
                     }
-
+                    #endregion
 
                     yield return new WaitForSecondsRealtime(timeExpMS / 1000f);
 
