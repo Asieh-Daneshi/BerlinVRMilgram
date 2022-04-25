@@ -64,6 +64,7 @@ namespace Experiment.Scripts.Core
             else
             {
                 txtAssetPause = new TextAsset(File.ReadAllText(strFNPause));
+                //textUI.text = txtAssetPause.text;
             }
             #endregion
 
@@ -98,7 +99,7 @@ namespace Experiment.Scripts.Core
             var instr11 = string.Format("instructions1{0}.txt", condNR);
             var strFNInstructions1 = Path.Combine(Application.streamingAssetsPath, instr11);
 
-
+            #region instructions at the beginning of the experiment
             if (!File.Exists(strFNInstructions1))
             {
                 var strErrorMessage = "Error:\n\"" + strFNInstructions1 + "\"\ndoes not exist";
@@ -108,14 +109,17 @@ namespace Experiment.Scripts.Core
             {
                 txtAssetInstructions1 = new TextAsset(File.ReadAllText(strFNInstructions1));
             }
-
+            #endregion
             bBlank = true;
 
-            // LogManager.instance.WriteEntry("Participant: " + experimentConfigNew.participant);
+            #region write the data with the name of the participant and condition
+            LogManager.instance.WriteEntry("Participant: " + experimentConfigNew.participant);
             hmdRecord.WriteHeader();
-            //LogManager.instance.WriteEntry("Condition: " + experimentConfigNew.condition);
+            LogManager.instance.WriteEntry("Condition: " + experimentConfigNew.condition);
             hmdRecord.WriteHeader();
+            #endregion
 
+            #region updating the positions of the agents
             var lstPositions = experimentConfigNew.getPositions();
             for (var i = 0; i < lCharacters.Count; i++)
             {
@@ -123,61 +127,68 @@ namespace Experiment.Scripts.Core
                 var c = lCharacters.ElementAt(i);
                 if (c != null)
                 {
-                    var temp = new Vector3(position[0], c.transform.position.y, position[1]);
+                    var temp = new Vector3(position[0], c.transform.position.y, position[1]);   // AD: position in y direction doesn't change and there is no need to update it!
                     c.transform.position = temp;
                 }
             }
-
-            TurnAllHeads("Panel");
+            #endregion
+            TurnAllHeads("Panel");  // AD: "TurnAllHeads" is a function that is introduced in line 460
         }
 
         void Update()
         {
-            if (!expRunning) StartCoroutine(RunExperiment());
+            if (!expRunning) StartCoroutine(RunExperiment());   // AD: if the experiment is not running, start "RunExperiment" Coroutine
+            /* AD: "public Coroutine StartCoroutine(IEnumerator routine)" Starts a Coroutine.
+            The execution of a coroutine can be paused at any point using the yield statement. When a yield statement is used, the coroutine pauses execution and automatically resumes at the next frame.*/
         }
 
         IEnumerator RunExperiment()
         {
+            // AD: getting parameters of the expeiment from json files
             var fSdSOA = experimentConfigNew.soa_sd_ms;
             var timeExpMS = experimentConfigNew.time_exp_ms;
             var condition = experimentConfigNew.condition;
 
-            LightTargetFires(false);
+            LightTargetFires(false);    // AD: This is a function introduced in line 454
 
+            // AD: activating the panel that the video is showing on it. It is in "Environment> projection stage". Also, the 8 min video is in this object!
             VRInteractiveItemPanel vriiPanel = null;
             var goPanel = GameObject.Find("Panel");
             if (goPanel) vriiPanel = goPanel.GetComponent<VRInteractiveItemPanel>();
 
             expRunning = true;
 
-            var blocks = experimentConfigNew.blocks;
+            var blocks = experimentConfigNew.blocks;    // AD: gets the blocks of the experiment from json files
 
-            var iNrBlocks = blocks.Count;
-            var iBlockCount = 0;
+            var iNrBlocks = blocks.Count;   // AD: number of blocks in the experiment
+            var iBlockCount = 0;    // AD: setting the initial value for the blocks
             foreach (var b in blocks)
             {
                 iBlockCount++;
 
-                SetScreenBlank(false);
+                SetScreenBlank(false);  // AD: this line is supposed to deactivate the function introduced in line 515. But, that function is commented for now, and if we uncomment it, we will realize that the object that this function is attached to it is gone!
                 // looping over blocks
-                var trials = b.trials;
-                foreach (var t in trials)
+                var trials = b.trials;  // AD: gets the "trials" variable from the json files
+                foreach (var t in trials)   // AD: t goes on the trials. In other words, it goes from 1 to 66
                 {
-                    var fMeanSOA = t.soa_means_ms;
-                    var normalDist = new Normal(fMeanSOA, fSdSOA);
+                    var qq = 0;
+                    qq++;
+                    print("trial " + qq);
+                    var fMeanSOA = t.soa_means_ms;  // AD: gets the starting time of the audio for the current trial
+                    var normalDist = new Normal(fMeanSOA, fSdSOA);  // AD: "fSdSOA" comes from the "soa_sd_ms" in json files. It is always zero. Therefore, this Normal distribution does nothing!
 
-                    hmdRecord.StartRecording();
+                    hmdRecord.StartRecording();     // AD: calls "hmdRecord" that we introduced in line 31 as "HMDRecord" which is a separate piece of code! So, here the data recording is started.
 
-                    var timeBlankMS = t.time_blank_ms;
+                    var timeBlankMS = t.time_blank_ms;  // AD: the time interval between the current trial and the previous trial.
                     yield return new WaitForSecondsRealtime(timeBlankMS / 1000f);
 
-                    var strTarget = "target0" + t.gaze_loc;
+                    var strTarget = "target0" + t.gaze_loc; // AD: "gaze_loc" comes from json files (it can be either 1 or 2, depending on the target that the agents in the current trial are supposed to look at. So, "strTarget" can be either target01 or target02. Both of them are in gameObjects.
                     var target = GameObject.Find(strTarget);
-                    var targetPos = target.transform.position;
+                    var targetPos = target.transform.position;  // AD: find the position of the current target.
                     currentTarget = strTarget;
-                    var strTargetPpn = "";
+                    var strTargetPpn = "";  // AD: defines a new variable "strTargetPpn", which its initial value is empty!
 
-                    if (condition == 1)
+                    if (condition == 1)     // AD: condition is extracted from json files in line 150. We have 6 different conditions. Each json file has 1 condition. They are not shuffled. So, files 1 to 6 are corresponding to conditions 1 to 6, and then these will repeat again, meaning that 8th file for example has condition 2.
                     {
                         if (t.audio_cue == 3)
                         {
@@ -359,7 +370,7 @@ namespace Experiment.Scripts.Core
                     PlayAudioCue.audioPlayer.playAudioCue(audioCue);
 
                     /* create array with delays for each character */
-                    var arrDelays = new double[charactersGazing.Length];
+            var arrDelays = new double[charactersGazing.Length];
                     normalDist.Samples(arrDelays);
                     Array.Sort(arrDelays);
 
@@ -392,6 +403,7 @@ namespace Experiment.Scripts.Core
 
                         fDelayOld = fDelay;
                         ii++;
+
                     }
 
 
@@ -427,7 +439,7 @@ namespace Experiment.Scripts.Core
                     // don't do pause screen after last block...
                     var strFNPause = Path.Combine(Application.streamingAssetsPath, "Pause.txt");
                     txtAssetPause = new TextAsset(File.ReadAllText(strFNPause));
-                    // textUI.text = txtAssetPause.text;
+                    textUI.text = txtAssetPause.text;
                     SetScreenBlank(true);
 
                     yield return new WaitUntil(() => expPaused == false);
@@ -443,16 +455,19 @@ namespace Experiment.Scripts.Core
             yield return new WaitForSecondsRealtime(1);
         }
 
+        #region turn on the fire on the supposed targets in the current trial
         void LightTargetFires(bool b)
         {
-            var gos = GameObject.FindGameObjectsWithTag("target");
+            var gos = GameObject.FindGameObjectsWithTag("target");  // AD: "GameObject.FindGameObjectsWithTag" returns an array of active GameObjects tagged tag. Returns empty array if no GameObject was found.
             foreach (var go in gos)
             {
-                var cc = (VRInteractiveItemTarget) go.GetComponent(typeof(VRInteractiveItemTarget));
-                cc.TurnFireOn(b);
+                var cc = (VRInteractiveItemTarget) go.GetComponent(typeof(VRInteractiveItemTarget));    // AD: there is a piece of code named "VRInteractiveItemTarget". This line calls that
+                cc.TurnFireOn(b);   // AD: "TurnFireOn" is a function in "VRInteractiveItemTarget".
             }
         }
+        #endregion
 
+        #region in this block, heads of all the agents that are supposed to look at one of the targets at each trial will be turned toward that target
         void TurnAllHeads(string _strTarget)
         {
             var target = GameObject.Find(_strTarget);
@@ -471,7 +486,9 @@ namespace Experiment.Scripts.Core
                 Debug.Log("ERROR: Target not found: " + _strTarget);
             }
         }
+        #endregion
 
+        #region in this block, heads of all the agents that were turned in the current trial will move back to the original position
         void ResetAllHeads()
         {
             foreach (var c in lCharacters)
@@ -480,6 +497,7 @@ namespace Experiment.Scripts.Core
                 cc.resetGaze();
             }
         }
+        #endregion
 
         void ToggleBlankScreen()
         {
@@ -500,21 +518,21 @@ namespace Experiment.Scripts.Core
 
         void SetScreenBlank(bool _bBlank)
         {
-            // if (_bBlank) {
-            //     if (m_ShowDebugMainController) {
-            //         print("setSceenBlank::blank");
+            // if (_bblank) {
+            //     if (m_showdebugmaincontroller) {
+            //         print("setsceenblank::blank");
             //     }
             //
-            //     canvasUI.enabled = true;
-            //     ResetAllHeads();
-            //     bBlank = true;
+            //     canvasui.enabled = true;
+            //     resetallheads();
+            //     bblank = true;
             // } else {
-            //     if (m_ShowDebugMainController) {
-            //         print("setSceenBlank::unblank");
+            //     if (m_showdebugmaincontroller) {
+            //         print("setsceenblank::unblank");
             //     }
             //
-            //     canvasUI.enabled = false;
-            //     bBlank = false;
+            //     canvasui.enabled = false;
+            //     bblank = false;
             // }
         }
     }
