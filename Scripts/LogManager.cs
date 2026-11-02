@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 
@@ -49,7 +50,7 @@ public class LogManager : MonoBehaviour
         if (m_ShowDebugLogManager) print("LogManager::writeEntry");
         using (var sw = new StreamWriter(filePath, true))
         {
-            sw.WriteLine(Time.realtimeSinceStartup + ";" + strMessage);
+            sw.WriteLine(Time.realtimeSinceStartup.ToString(CultureInfo.InvariantCulture) + ";" + strMessage);
         }
     }
 
