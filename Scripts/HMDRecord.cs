@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+using System.Globalization;
 using System.IO;
 
 public class HMDRecord : MonoBehaviour
@@ -52,13 +53,13 @@ public class HMDRecord : MonoBehaviour
             var p = gameObject.transform.position;
             var r = gameObject.transform.eulerAngles;
 
-            var strData = Time.realtimeSinceStartup + ";HMD;" +
-                          p.x.ToString(format) + ";" +
-                          p.y.ToString(format) + ";" +
-                          p.z.ToString(format) + ";" +
-                          r.x.ToString(format) + ";" +
-                          r.y.ToString(format) + ";" +
-                          r.z.ToString(format);
+            var strData = Time.realtimeSinceStartup.ToString(CultureInfo.InvariantCulture) + ";HMD;" +
+                          p.x.ToString(format, CultureInfo.InvariantCulture) + ";" +
+                          p.y.ToString(format, CultureInfo.InvariantCulture) + ";" +
+                          p.z.ToString(format, CultureInfo.InvariantCulture) + ";" +
+                          r.x.ToString(format, CultureInfo.InvariantCulture) + ";" +
+                          r.y.ToString(format, CultureInfo.InvariantCulture) + ";" +
+                          r.z.ToString(format, CultureInfo.InvariantCulture);
 
             data.Add(strData);
         }

@@ -24,7 +24,7 @@ Unity (C#) scripts for a VR experiment (the "Emiel experiment"). This repository
 - `WriteCSV(header, rows)` writes a comma-separated header line followed by one comma-separated line per row.
 - `HMDRecord` buffers one row per rendered frame while recording and writes them in `StopAndWriteData()`. A row is `time;HMD;pos_x;pos_y;pos_z;rot_x;rot_y;rot_z` with the pose rounded to four decimals. `WriteHeader()` writes the matching header line (`time;event;pos_x;...;rot_z`).
 
-Numbers are converted with `ToString`, which uses the current system culture. On a machine set to a locale with a decimal comma (for example German), values are written with a comma, so check the locale of the recording computer before parsing the files.
+Numbers are written with the invariant culture (a decimal point), independent of the system language of the recording computer.
 
 ## Using the scripts
 
