@@ -16,6 +16,9 @@ public class LogManager : MonoBehaviour
     string filePath;
     [SerializeField] bool m_ShowDebugLogManager;
 
+    // Participant number used in the log file name. Set it in the Inspector for each session.
+    [SerializeField] string m_ParticipantNumber = "000001";
+
     //Awake is always called before any Start functions
     void Awake()
     {
@@ -35,7 +38,7 @@ public class LogManager : MonoBehaviour
         var strDir = Application.persistentDataPath;
 
         //added participant number to filepath
-        var Nr = "000001"; //EnterNR.NumberText;
+        var Nr = m_ParticipantNumber;
         filePath = Path.Combine(strDir, DateTime.Now.ToString("yyyyMMdd-HHmmss") + "_" + Nr + "_data.txt");
 
         /* opening the writer here causes obscure problems (file access permission) errors when Unity loses focus.
