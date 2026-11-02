@@ -17,7 +17,7 @@ Unity (C#) scripts for a VR experiment (the "Emiel experiment"). This repository
 
 ## Log file format
 
-`LogManager` appends every entry to one text file in `Application.persistentDataPath`, named `yyyyMMdd-HHmmss_<participant>_data.txt`. The participant number is currently the fixed placeholder `000001` in `LogManager.cs`, so set it before running real sessions.
+`LogManager` appends every entry to one text file in `Application.persistentDataPath`, named `yyyyMMdd-HHmmss_<participant>_data.txt`. The participant number comes from the `Participant Number` field of the `LogManager` component in the Inspector (default `000001`), so set it for each session before pressing play.
 
 - `WriteTimeStampedEntry(msg)` writes `<Time.realtimeSinceStartup>;<msg>`.
 - `WriteEntry(msg)` and `WriteEntry(list)` write the text as it is, one line per string.
