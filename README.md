@@ -7,7 +7,7 @@ Unity (C#) scripts for a VR experiment (the "Emiel experiment"). This repository
 | File | Purpose |
 |---|---|
 | `HMDRecord.cs` | Records the head-mounted display pose every frame (time, position x/y/z, rotation x/y/z) as semicolon-separated rows. |
-| `LogManager.cs` | Singleton that writes timestamped log entries to a text file in `Application.persistentDataPath`. The file name contains the date, time and a participant number (currently a placeholder). |
+| `LogManager.cs` | Singleton that writes timestamped log entries to a text file in `Application.persistentDataPath`. The file name contains the date, time and the participant number set in the Inspector (see Log file format below). |
 | `charControl.cs` | Controls a virtual character's gaze with the Animator IK system: smoothly looks at a target position and smoothly turns back. |
 | `PlayAudioCue.cs` | Plays one of three audio cues. |
 | `PlayAudioFeedback.cs` | Plays a "correct" or "wrong" feedback sound. |
